@@ -1,0 +1,48 @@
+spring:
+  application:
+    name: identity-service
+  profiles:
+    active: docker
+
+  datasource:
+    #url: jdbc:postgresql://postgres:5432/identitydb
+    url: jdbc:postgresql://localhost:5432/identitydb
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: deepak.tech.hub.300@gmail.com
+    password: ${DTH_GMAIL_PWD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+jwt:
+  secret: ${DTH_JWT_SECRET}
+  accessTokenExpiryMs: 900000       # 15 minutes
+  refreshTokenExpiryMs: 604800000   # 7 days
+
+logging:
+  level:
+    root: INFO
+    com.deeptechhub.identityservice: DEBUG
+  file:
+    name: logs/identity-service.log
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"

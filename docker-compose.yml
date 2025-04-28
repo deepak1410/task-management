@@ -1,0 +1,69 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16
+    container_name: deeptechhub-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: identitydb
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - deeptechhub-network
+
+  identity-service:
+    build:
+      context: ./identity-service
+    container_name: identity-service
+    depends_on:
+      - postgres
+    environment:
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DTH_JWT_SECRET: ${DTH_JWT_SECRET}
+      DTH_GMAIL_PWD: ${DTH_GMAIL_PWD}
+    ports:
+      - "8081:8081"
+    networks:
+      - deeptechhub-network
+
+  task-service:
+    build:
+      context: ./task-service
+    container_name: task-service
+    depends_on:
+      - postgres
+      - identity-service
+    environment:
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DTH_JWT_SECRET: ${DTH_JWT_SECRET}
+      IDENTITY_SERVICE_URL: http://identity-service:8081
+    ports:
+      - "8082:8082"
+    networks:
+      - deeptechhub-network
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PWD}
+    ports:
+      - "6070:80"
+    depends_on:
+      - postgres
+    networks:
+      - deeptechhub-network
+
+volumes:
+  postgres_data:
+
+networks:
+  deeptechhub-network:
+    driver: bridge
