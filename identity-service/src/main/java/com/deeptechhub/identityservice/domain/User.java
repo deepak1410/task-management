@@ -1,5 +1,6 @@
 package com.deeptechhub.identityservice.domain;
 
+import com.deeptechhub.common.dto.Role;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

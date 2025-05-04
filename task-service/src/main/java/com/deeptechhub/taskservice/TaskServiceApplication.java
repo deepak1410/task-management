@@ -9,6 +9,7 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 public class TaskServiceApplication {
 
 	public static void main(String[] args) {
+
 		SpringApplication.run(TaskServiceApplication.class, args);
 	}
 

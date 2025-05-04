@@ -1,11 +1,14 @@
 package com.deeptechhub.taskservice.security;
 
+import com.deeptechhub.common.dto.UserDto;
 import com.deeptechhub.taskservice.exception.JwtAuthenticationException;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -17,8 +20,9 @@ import java.util.function.Function;
 @Service
 @RequiredArgsConstructor
 public class JwtServiceImpl implements JwtService {
-   // @Value("${jwt.secret}")
-    private String jwtSecret = "S4DaokTZiN2M+DqfWh1nlDJ2o2LARKaXJoEzZ0Ihvtg=";
+    private static final Logger log = LoggerFactory.getLogger(JwtServiceImpl.class);
+    @Value("${jwt.secret}")
+    private String jwtSecret;
     private SecretKey secretKey;
     private JwtParser jwtParser;
 
@@ -34,9 +38,9 @@ public class JwtServiceImpl implements JwtService {
     }
 
     @Override
-    public boolean isTokenValid(String token, UserDetails userDetails) {
+    public boolean isTokenValid(String token, UserDto userDto) {
         final String username = extractUsername(token);
-        return username.equals(userDetails.getUsername()) && !isTokenExpired(token);
+        return username.equals(userDto.getUsername()) && !isTokenExpired(token);
     }
 
     private boolean isTokenExpired(String token) {
@@ -52,6 +56,7 @@ public class JwtServiceImpl implements JwtService {
         try {
             return jwtParser.parseSignedClaims(token).getPayload();
         } catch (JwtException ex) {
+            log.warn("Invalid JWT token: {}", ex.getMessage());
             throw new JwtAuthenticationException("Invalid JWT token");
         }
     }

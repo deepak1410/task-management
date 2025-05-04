@@ -4,29 +4,46 @@ services:
   postgres:
     image: postgres:16
     container_name: deeptechhub-postgres
+    env_file: .env
     restart: unless-stopped
     environment:
-      POSTGRES_USER: ${DB_USERNAME}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
-      POSTGRES_DB: identitydb
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD_FILE: /run/secrets/db_password
+    secrets:
+      - db_password
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./init-scripts:/docker-entrypoint-initdb.d
     ports:
       - "5432:5432"
     networks:
       - deeptechhub-network
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER}" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   identity-service:
     build:
       context: ./identity-service
     container_name: identity-service
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
+    env_file: .env
     environment:
-      DB_USERNAME: ${DB_USERNAME}
-      DB_PASSWORD: ${DB_PASSWORD}
-      DTH_JWT_SECRET: ${DTH_JWT_SECRET}
-      DTH_GMAIL_PWD: ${DTH_GMAIL_PWD}
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: ${IDENTITY_DB_NAME}
+      DB_USER: ${POSTGRES_USER}
+      DB_PASSWORD_FILE: /run/secrets/db_password
+      DTH_JWT_SECRET_FILE: /run/secrets/jwt_secret
+      DTH_GMAIL_PWD_FILE: /run/secrets/gmail_pass
+    secrets:
+      - db_password
+      - jwt_secret
+      - gmail_pass
     ports:
       - "8081:8081"
     networks:
@@ -36,21 +53,33 @@ services:
     build:
       context: ./task-service
     container_name: task-service
+    env_file: .env
     depends_on:
-      - postgres
-      - identity-service
+      postgres:
+        condition: service_healthy
+      identity-service:
+        condition: service_started
     environment:
-      DB_USERNAME: ${DB_USERNAME}
-      DB_PASSWORD: ${DB_PASSWORD}
-      DTH_JWT_SECRET: ${DTH_JWT_SECRET}
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: ${TASK_DB_NAME}
+      DB_USER: ${POSTGRES_USER}
+      DB_PASSWORD_FILE: /run/secrets/db_password
+      DTH_JWT_SECRET_FILE: /run/secrets/jwt_secret
       IDENTITY_SERVICE_URL: http://identity-service:8081
+    secrets:
+      - db_password
+      - jwt_secret
+      - gmail_pass
     ports:
       - "8082:8082"
     networks:
       - deeptechhub-network
+
   pgadmin:
     image: dpage/pgadmin4
     container_name: pgadmin4
+    env_file: .env
     environment:
       PGADMIN_DEFAULT_EMAIL: admin@admin.com
       PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PWD}
@@ -63,6 +92,14 @@ services:
 
 volumes:
   postgres_data:
+
+secrets:
+  db_password:
+    file: ./secrets/db_password.txt
+  jwt_secret:
+    file: ./secrets/jwt-secret.txt
+  gmail_pass:
+    file: ./secrets/gmail-pass.txt
 
 networks:
   deeptechhub-network:

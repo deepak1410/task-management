@@ -1,0 +1,5 @@
+CREATE TABLE IF NOT EXISTS tasks (
+    id BIGSERIAL PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    created_by VARCHAR(255) NOT NULL
+);

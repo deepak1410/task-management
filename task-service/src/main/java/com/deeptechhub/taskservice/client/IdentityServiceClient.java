@@ -11,4 +11,7 @@ public interface IdentityServiceClient {
     @GetMapping("/api/users/{id}")
     UserDto getUserById(@PathVariable("id") Long id);
 
+    @GetMapping("/api/users/username/{username}")
+    UserDto getUserByUsername(@PathVariable("username") String username);
+
 }

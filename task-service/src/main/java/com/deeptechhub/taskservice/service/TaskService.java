@@ -1,11 +1,13 @@
 package com.deeptechhub.taskservice.service;
 
+import com.deeptechhub.common.dto.UserDto;
 import com.deeptechhub.common.exception.ResourceNotFoundException;
 import com.deeptechhub.taskservice.client.IdentityServiceClient;
 import com.deeptechhub.taskservice.domain.Task;
 import com.deeptechhub.taskservice.dto.TaskRequest;
 import com.deeptechhub.taskservice.dto.TaskResponse;
 import com.deeptechhub.taskservice.repository.TaskRepository;
+import com.deeptechhub.taskservice.util.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -22,9 +24,8 @@ public class TaskService {
     private final TaskRepository taskRepository;
     private final IdentityServiceClient identityServiceClient;
 
-    public TaskResponse createTask(TaskRequest taskRequest, String username) {
-        //TODO: Make an API call to get User object
-        Long createdByUserId = new Random().nextLong();
+    public TaskResponse createTask(TaskRequest taskRequest) {
+        Long createdByUserId = SecurityUtils.getCurrentUser().getId();
 
         // Get task from request object
         Task task = new Task();
@@ -38,12 +39,11 @@ public class TaskService {
         Task createdTask = taskRepository.save(task);
         log.info("Successfully saved task {}", task);
 
-        return TaskResponse.fromTask(task);
+        return TaskResponse.fromTask(createdTask);
     }
 
     public List<TaskResponse> getUserTasks(String username) {
-        //TODO: Get User by username
-        Long createdByUserId = new Random().nextLong();
+        Long createdByUserId = SecurityUtils.getCurrentUser().getId();
 
         return taskRepository.findByCreatedByUserId(createdByUserId).stream()
                 .map(TaskResponse::fromTask)

@@ -34,7 +34,7 @@ public class TaskController {
 
         log.debug("Attempting to create a task for user {}", userDetails.getUsername());
 
-        TaskResponse taskResponse = taskService.createTask(taskRequest, userDetails.getUsername());
+        TaskResponse taskResponse = taskService.createTask(taskRequest);
         return ResponseEntity.created(URI.create("/tasks" + taskResponse.id()))
                 .body(taskResponse);
     }

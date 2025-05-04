@@ -19,7 +19,7 @@ public class Task {
     private String title;
     private String description;
     private LocalDateTime dueDate;
-    private boolean completed;
+    private boolean completed = false;
 
     @Column(name = "created_by_user_id")
     private Long createdByUserId;

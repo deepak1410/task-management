@@ -4,12 +4,9 @@ spring:
   profiles:
     active: docker
 
-  datasource:
-    #url: jdbc:postgresql://postgres:5432/taskdb  # Needed when running using docker
-    url: jdbc:postgresql://localhost:5432/taskdb
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
-    driver-class-name: org.postgresql.Driver
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
 
   jpa:
     hibernate:
@@ -36,7 +33,7 @@ logging:
     file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
 
 identity-service:
-  url: ${IDENTITY_SERVICE_URL:http://localhost:8081} # The identity service URL
+  url: ${IDENTITY_SERVICE_URL:http://localhost:8081}
 
 # Feign specific config
 feign:

@@ -1,90 +1,87 @@
+## Architecture
+```mermaid
+graph TD
+    A[deeptechhub] --> B[identity-service]
+    A --> C[task-service]
+    A --> D[common-lib]
+    B --> E[(Postgres)]
+    C --> F[(Postgres)]
+    B & C --> G[Redis]
+```
+
 ## Steps to Run
-* Run the following commands below from the identity-service and task-service directories
+1. Build JARs with correct manifest:
 
 ```
-cd identity-service
-mvn clean package -DskipTests
-cd ../task-service
-mvn clean package -DskipTests
-cd ..
+mvn clean install -DskipTests
+
 ```
+2. Run services via Docker compose
 
-* Run the following commands to execute docker instructions
+   - Run all the services (Simplest)
+      ```
+      docker-compose --env-file .env up --build
+      ```
+   - Alternately, Run only postgres and pgadmin services using docker
+      ```
+      docker-compose --env-file .env up --build postgres pgadmin
+      ```
+     - Run identity-service and task-service using Intellij
+     - Add following VM Option in Intellij `-Dspring.profiles.active=local`
 
-`docker-compose --env-file .env up --build`
+------
+## Useful Docker commands
 
-* To access PgAdmin, use URL http://localhost:6070/browser/ with credentials defined in .env file.
-
-### ✅ To **Start** All Containers (Detached Mode)
-
-Run this from project root:
-
-```bash
-docker-compose --env-file .env up -d
-```
-
-- `-d` = **detached mode**, runs everything in the background
-- You don’t need to keep the terminal open
-
----
-
-### ✅ To **Stop** All Containers
-
-When you're done and want to shut things down:
+* To **Stop and remove** All Containers, but not volumes or images
 
 ```bash
 docker-compose down
 ```
 
-This:
-- Stops all services
-- Removes containers, but **not** volumes or images
-
----
-
-### ✅ To **Start Again Later**
-
-Just run this again (detached mode preferred):
+* Running in detached mode:
 
 ```bash
 docker-compose --env-file .env up -d
 ```
 
-No need to rebuild unless you changed the code or Dockerfiles. If you **did** make code changes, do:
+* If code or Dockerfiles have been changed, use `--build` in the command.
 
 ```bash
 docker-compose --env-file .env up -d --build
 ```
 
----
-
-### 🧼 Optional: To Clean Everything
-
-If you ever want to remove everything (containers, networks, volumes):
+* If you ever want to remove everything (containers, networks, volumes):
 
 ```bash
 docker-compose down -v
 ```
 
-⚠️ This will delete your `postgres_data` volume and all your data.
-
----
-
-### 🕵️‍♂️ To Check Status of Running Containers
+* To Check Status of Running Containers
 
 ```bash
 docker ps
 ```
 
-And to see logs for a service:
+* And to see logs for a service:
 
 ```bash
 docker logs identity-service
 ```
 
-Or stream logs live:
+* To stream logs live:
 
 ```bash
 docker-compose logs -f
 ```
 
+## Connect to Database using DBeaver
+* Open DBeaver → Database > New Connection.
+* Choose PostgreSQL.
+* Fill details:
+  - Host: localhost
+  - Port: 5432 
+  - Database: keep empty and tick the checkbox "Show all Databases"
+  - Username: value of ${POSTGRES_USER} 
+  - Password: content of secrets/postgres_password.txt
+* Test connection and Save.
+* To access PgAdmin, use URL http://localhost:6070/browser/ with credentials defined in .env file.

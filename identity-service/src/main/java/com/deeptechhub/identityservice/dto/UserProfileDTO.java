@@ -1,7 +1,7 @@
 package com.deeptechhub.identityservice.dto;
 
 
-import com.deeptechhub.identityservice.domain.Role;
+import com.deeptechhub.common.dto.Role;
 import com.deeptechhub.identityservice.domain.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

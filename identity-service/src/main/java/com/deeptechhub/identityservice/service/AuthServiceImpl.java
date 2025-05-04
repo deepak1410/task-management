@@ -1,7 +1,7 @@
 package com.deeptechhub.identityservice.service;
 
+import com.deeptechhub.common.dto.Role;
 import com.deeptechhub.identityservice.domain.EmailToken;
-import com.deeptechhub.identityservice.domain.Role;
 import com.deeptechhub.identityservice.domain.TokenType;
 import com.deeptechhub.identityservice.domain.User;
 import com.deeptechhub.identityservice.dto.*;
