@@ -22,9 +22,9 @@ mvn clean install -DskipTests
       ```
       docker-compose --env-file .env up --build
       ```
-   - Alternately, Run only postgres and pgadmin services using docker
+   - Alternately, Run only postgres, pgadmin, and redis services using docker
       ```
-      docker-compose --env-file .env up --build postgres pgadmin
+      docker-compose --env-file .env up --build postgres pgadmin redis
       ```
      - Run identity-service and task-service using Intellij
      - Add following VM Option in Intellij `-Dspring.profiles.active=local`

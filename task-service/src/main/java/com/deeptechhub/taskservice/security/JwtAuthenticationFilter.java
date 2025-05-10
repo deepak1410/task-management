@@ -2,6 +2,7 @@ package com.deeptechhub.taskservice.security;
 
 import com.deeptechhub.common.dto.UserDto;
 import com.deeptechhub.taskservice.client.IdentityServiceClient;
+import feign.FeignException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -50,7 +51,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         if(username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             //Get the user details from identity-service
-            UserDto userDto = identityServiceClient.getUserByUsername(username);
+            UserDto userDto = null;
+            try {
+                userDto = identityServiceClient.getUserByUsername(username);
+            } catch (FeignException.Forbidden ex) {
+                log.warn("Access forbidden for user {} when calling identity-service: {}", username, ex.getMessage());
+                response.sendError(HttpServletResponse.SC_FORBIDDEN, "Access denied");
+                return;
+            } catch (FeignException.Unauthorized ex) {
+                log.warn("Unauthorized access for user {} when calling identity-service: {}", username, ex.getMessage());
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
+                return;
+            }
+
             UserDetails userDetails = userDetailsMapper.toUserDetails(userDto);
 
             boolean isTokenValid = jwtService.isTokenValid(jwtToken, userDto);

@@ -1,12 +1,12 @@
 package com.deeptechhub.identityservice.service;
 
+import com.deeptechhub.identityservice.config.JwtProperties;
 import com.deeptechhub.identityservice.exception.JwtAuthenticationException;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -17,19 +17,13 @@ import java.util.function.Function;
 @Service
 @RequiredArgsConstructor
 public class JwtServiceImpl implements JwtService {
-    @Value("${jwt.secret}")
-    private String jwtSecret;
+    private final JwtProperties jwtProperties;
     private SecretKey secretKey;
     private JwtParser jwtParser;
-    @Value("${jwt.accessTokenExpiryMs}")
-    private long accessTokenExpiryMs; // Used for authentication
-
-    @Value("${jwt.refreshTokenExpiryMs}")
-    private long refreshTokenExpiryMs; // Used for generating new access token
 
     @PostConstruct
     public void init() {
-        this.secretKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtSecret));
+        this.secretKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtProperties.getSecret()));
         this.jwtParser = Jwts.parser().verifyWith(secretKey).build();
     }
 
@@ -46,12 +40,12 @@ public class JwtServiceImpl implements JwtService {
 
     @Override
     public String generateAccessToken(String username) {
-        return generateToken(username, accessTokenExpiryMs);
+        return generateToken(username, jwtProperties.getAccessTokenExpiryMs());
     }
 
     @Override
     public String generateRefreshToken(String username) {
-        return generateToken(username, refreshTokenExpiryMs);
+        return generateToken(username, jwtProperties.getRefreshTokenExpiryMs());
     }
 
     private String generateToken(String username, long expiryMs) {

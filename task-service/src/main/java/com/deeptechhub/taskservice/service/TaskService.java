@@ -1,8 +1,6 @@
 package com.deeptechhub.taskservice.service;
 
-import com.deeptechhub.common.dto.UserDto;
 import com.deeptechhub.common.exception.ResourceNotFoundException;
-import com.deeptechhub.taskservice.client.IdentityServiceClient;
 import com.deeptechhub.taskservice.domain.Task;
 import com.deeptechhub.taskservice.dto.TaskRequest;
 import com.deeptechhub.taskservice.dto.TaskResponse;
@@ -15,14 +13,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Random;
 
 @Service
 @RequiredArgsConstructor
 public class TaskService {
     private static final Logger log = LoggerFactory.getLogger(TaskService.class);
     private final TaskRepository taskRepository;
-    private final IdentityServiceClient identityServiceClient;
 
     public TaskResponse createTask(TaskRequest taskRequest) {
         Long createdByUserId = SecurityUtils.getCurrentUser().getId();

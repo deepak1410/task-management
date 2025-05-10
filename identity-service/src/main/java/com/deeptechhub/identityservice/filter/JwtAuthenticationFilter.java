@@ -1,6 +1,8 @@
 package com.deeptechhub.identityservice.filter;
 
 import com.deeptechhub.identityservice.service.JwtService;
+import com.deeptechhub.identityservice.service.TokenBlacklistService;
+import com.deeptechhub.identityservice.util.AuthUtils;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -23,6 +25,7 @@ import java.io.IOException;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
+    private final TokenBlacklistService tokenBlacklistService;
     private static final Logger log = LoggerFactory.getLogger(JwtAuthenticationFilter.class);
 
     @Override
@@ -31,19 +34,21 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             HttpServletResponse response,
             FilterChain filterChain) throws ServletException, IOException {
 
-        final String authHeader = request.getHeader("Authorization");
-        log.debug("authHeader has been retrieved as {}", authHeader);
-        final String jwtToken;
-        final String username;
+        final String jwtToken = AuthUtils.extractToken(request);
 
         // Validate the AuthHeader
-        if(authHeader == null || !authHeader.startsWith("Bearer ")) {
+        if(jwtToken == null) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        jwtToken = authHeader.substring(7);
-        username = jwtService.extractUsername(jwtToken);
+        if(tokenBlacklistService.isTokenBlacklisted(jwtToken)) {
+            log.warn("JWT token is blacklisted");
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token revoked");
+            return;
+        }
+
+        final String username = jwtService.extractUsername(jwtToken);
         log.debug("Username has been extracted as {}", username);
 
         if(username != null && SecurityContextHolder.getContext().getAuthentication() == null) {

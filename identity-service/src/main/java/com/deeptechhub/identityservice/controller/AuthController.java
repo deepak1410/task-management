@@ -1,5 +1,6 @@
 package com.deeptechhub.identityservice.controller;
 
+import com.deeptechhub.identityservice.config.JwtProperties;
 import com.deeptechhub.identityservice.dto.AuthRequest;
 import com.deeptechhub.identityservice.dto.AuthResponse;
 import com.deeptechhub.identityservice.dto.RegisterRequest;
@@ -8,8 +9,13 @@ import com.deeptechhub.identityservice.dto.ResetPasswordRequest;
 import com.deeptechhub.identityservice.domain.User;
 import com.deeptechhub.identityservice.service.AuthService;
 import com.deeptechhub.identityservice.service.RefreshTokenService;
+import com.deeptechhub.identityservice.service.TokenBlacklistService;
+import com.deeptechhub.identityservice.util.AuthUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
@@ -18,10 +24,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.nio.file.AccessDeniedException;
+import java.time.Duration;
 
 @Tag(name="Authentication", description = "User registration and authentication APIs")
 @RestController
@@ -33,6 +41,8 @@ public class AuthController {
 
     private final AuthService authService;
     private final RefreshTokenService refreshTokenService;
+    private final TokenBlacklistService tokenBlacklistService;
+    private final JwtProperties jwtProperties;
 
     @Operation(summary = "Register a new user")
     @PostMapping(path = "/register")
@@ -80,8 +90,8 @@ public class AuthController {
         return ResponseEntity.ok(authResponse);
     }
 
-    @PostMapping("/logout")
-    public ResponseEntity<String> logout(@RequestBody @Valid RefreshTokenRequest request,
+    /*@PostMapping("/logout")
+    public ResponseEntity<String> logout1(@RequestBody @Valid RefreshTokenRequest request,
                                        @AuthenticationPrincipal UserDetails userDetails) {
         try {
             refreshTokenService.revokeToken(request.refreshToken(), userDetails.getUsername());
@@ -89,6 +99,46 @@ public class AuthController {
             ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
         }
         return ResponseEntity.ok("Logged out successfully");
+    }*/
+
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout(HttpServletRequest request, HttpServletResponse response,
+                                       @CookieValue(name = "refreshToken", required = false) String refreshToken) {
+        // Invalidate accessToken
+        String accessToken = AuthUtils.extractToken(request);
+        tokenBlacklistService.blacklistToken(accessToken,
+                Duration.ofMillis(jwtProperties.getAccessTokenExpiryMs()));
+
+        // Invalidate refresh token if exists
+        if (refreshToken != null) {
+            tokenBlacklistService.blacklistToken(refreshToken,
+                    Duration.ofMillis(jwtProperties.getRefreshTokenExpiryMs()));
+        }
+
+        // Clear cookies
+        clearAuthCookies(response);
+
+        // Clear security context
+        SecurityContextHolder.clearContext();
+
+        return ResponseEntity.noContent().build();
+    }
+
+    private void clearAuthCookies(HttpServletResponse response) {
+        Cookie accessCookie = new Cookie("accessToken", null);
+        accessCookie.setHttpOnly(true);
+        accessCookie.setSecure(true);
+        accessCookie.setPath("/");
+        accessCookie.setMaxAge(0);
+
+        Cookie refreshCookie = new Cookie("refreshToken", null);
+        refreshCookie.setHttpOnly(true);
+        refreshCookie.setSecure(true);
+        refreshCookie.setPath("/api/auth/refresh-token");
+        refreshCookie.setMaxAge(0);
+
+        response.addCookie(accessCookie);
+        response.addCookie(refreshCookie);
     }
 
 }
