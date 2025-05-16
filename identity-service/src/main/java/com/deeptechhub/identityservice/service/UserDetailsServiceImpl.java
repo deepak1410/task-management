@@ -4,6 +4,7 @@ import com.deeptechhub.identityservice.exception.UserAuthException;
 import com.deeptechhub.identityservice.repository.UserRepository;
 import com.deeptechhub.identityservice.domain.User;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -26,7 +27,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         return org.springframework.security.core.userdetails.User
                 .withUsername(user.getUsername())
                 .password(user.getPassword())
-                .authorities(user.getRole().name()) // Role is an enum
+                .authorities(new SimpleGrantedAuthority(user.getRole().getAuthority())) // Role is an enum
                 .build();
     }
 }

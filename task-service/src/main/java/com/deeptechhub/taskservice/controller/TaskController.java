@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
@@ -29,9 +30,9 @@ public class TaskController {
     @Operation(summary = "Create a new task")
     @SecurityRequirement(name="bearerAuth")
     @PostMapping
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public ResponseEntity<TaskResponse> createTask(@RequestBody @Valid TaskRequest taskRequest,
                                                    @AuthenticationPrincipal UserDetails userDetails) {
-
         log.debug("Attempting to create a task for user {}", userDetails.getUsername());
 
         TaskResponse taskResponse = taskService.createTask(taskRequest);
@@ -40,18 +41,30 @@ public class TaskController {
     }
 
     @GetMapping
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public List<TaskResponse> getUserTasks(@AuthenticationPrincipal UserDetails userDetails) {
         log.debug("Fetch user tasks for username {}", userDetails.getUsername());
         return taskService.getUserTasks(userDetails.getUsername());
     }
 
+    @Tag(name="Tasks", description = "Fetch tasks for all users")
+    @GetMapping("/all")
+    @PreAuthorize("hasAnyRole('ADMIN')")
+    public List<TaskResponse> getAllTasks(@AuthenticationPrincipal UserDetails userDetails) {
+        log.debug("Get all the tasks for different users");
+        return taskService.getAllTasks();
+
+    }
+
     @GetMapping(path = "/{id}")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public ResponseEntity<TaskResponse> getTaskById(@PathVariable("id") Long id) {
         log.debug("Fetching task with id {}", id);
         return ResponseEntity.ok(taskService.getTask(id));
     }
 
     @DeleteMapping(path = "/{id}")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public ResponseEntity<Void> deleteTaskById(@PathVariable("id") Long id) {
         log.debug("Attempting to delete task with id {}", id);
         taskService.deleteTask(id);
@@ -60,6 +73,7 @@ public class TaskController {
     }
 
     @PutMapping(path="/{id}")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public ResponseEntity<TaskResponse> updateTask(@RequestBody @Valid TaskRequest taskRequest,
                                                    @PathVariable("id") Long id) {
         log.debug("Attempting to update task with id {}", id);

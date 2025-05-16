@@ -1,5 +1,6 @@
 package com.deeptechhub.identityservice.service;
 
+import com.deeptechhub.common.dto.Role;
 import com.deeptechhub.common.dto.UserDto;
 import com.deeptechhub.identityservice.dto.UpdateProfileDTO;
 import com.deeptechhub.identityservice.dto.UserProfileDTO;
@@ -14,4 +15,5 @@ public interface UserService {
     public UserProfileDTO getCurrentUserProfile(String username);
     public UserProfileDTO updateUserProfile(String username, UpdateProfileDTO updateProfileDTO);
     public List<UserProfileDTO> listAllUsers();
+    public void updateUserRole(Long userId, Role newRole);
 }

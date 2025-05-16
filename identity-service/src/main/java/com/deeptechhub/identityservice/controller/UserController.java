@@ -1,5 +1,6 @@
 package com.deeptechhub.identityservice.controller;
 
+import com.deeptechhub.common.dto.Role;
 import com.deeptechhub.common.dto.UserDto;
 import com.deeptechhub.identityservice.dto.UpdateProfileDTO;
 import com.deeptechhub.identityservice.dto.UserProfileDTO;
@@ -54,6 +55,17 @@ public class UserController {
     public ResponseEntity<UserDto> getUserById(@PathVariable("username") String username) {
         log.debug("Attempting to get user by username {}", username);
         return ResponseEntity.ok(userService.findByUsername(username));
+    }
+
+    @PatchMapping("/{userId}/role")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Void> updateUserRole(
+            @PathVariable("userId") Long userId,
+            @RequestParam(name = "newRole") Role newRole
+    ) {
+        log.debug("Attempting to update role for userId {} with role {}", userId, newRole);
+        userService.updateUserRole(userId, newRole);
+        return ResponseEntity.noContent().build();
     }
 
 }

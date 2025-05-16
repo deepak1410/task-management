@@ -46,6 +46,12 @@ public class TaskService {
                 .toList();
     }
 
+    public List<TaskResponse> getAllTasks() {
+        return taskRepository.findAll().stream()
+                .map(TaskResponse::fromTask)
+                .toList();
+    }
+
     public TaskResponse getTask(Long id) {
         return taskRepository.findById(id)
                 .map(TaskResponse::fromTask)

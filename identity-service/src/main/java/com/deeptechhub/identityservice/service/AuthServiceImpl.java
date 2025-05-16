@@ -55,7 +55,7 @@ public class AuthServiceImpl implements AuthService {
 
     public AuthResponse login(AuthRequest authRequest) {
         Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword()));
+                new UsernamePasswordAuthenticationToken(authRequest.username(), authRequest.password()));
 
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         User user = userRepository.findByUsername(userDetails.getUsername()).orElseThrow();
@@ -99,6 +99,10 @@ public class AuthServiceImpl implements AuthService {
     public User verifyEmail(String tokenStr) {
         EmailToken token = emailTokenRepository.findByTokenAndUsedFalseAndExpiryDateAfter(tokenStr, LocalDateTime.now())
                 .orElseThrow(() -> new ResourceNotFoundException("Invalid or expired token"));
+
+        if (token.getUser().isEmailVerified()) {
+            throw new ResourceNotFoundException("Email already verified");
+        }
 
         User user = token.getUser();
         user.setEmailVerified(true);

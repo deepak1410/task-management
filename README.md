@@ -85,3 +85,8 @@ docker-compose logs -f
   - Password: content of secrets/postgres_password.txt
 * Test connection and Save.
 * To access PgAdmin, use URL http://localhost:6070/browser/ with credentials defined in .env file.
+
+
+## Documentation
+### Task-Service
+- [Dev notes] (task-service/docs/dev_note.md)

@@ -1,6 +1,7 @@
 package com.deeptechhub.identityservice.service;
 
 
+import com.deeptechhub.common.dto.Role;
 import com.deeptechhub.common.dto.UserDto;
 import com.deeptechhub.identityservice.domain.User;
 import com.deeptechhub.identityservice.dto.UpdateProfileDTO;
@@ -62,6 +63,18 @@ public class UserServiceImpl implements UserService {
         return userRepository.findAll().stream()
                 .map(UserProfileDTO::fromUser)
                 .toList();
+    }
+
+    @Override
+    public void updateUserRole(Long userId, Role newRole) {
+        User user = userRepository.findById(userId).orElseThrow(() ->
+                new ResourceNotFoundException("User with id " + userId + " not found"));
+
+        if(user.getRole() == newRole) {
+            return; // No change needed;
+        }
+        user.setRole(newRole);
+        userRepository.save(user);
     }
 
     private UserDto getUserDtoFromUser(User user) {

@@ -44,22 +44,6 @@ public class RefreshTokenService {
                 .filter(rt -> !rt.isRevoked() && rt.getExpiryDate().isAfter(LocalDateTime.now()));
     }
 
-    public void revokeToken(String token, String currentUsername) throws AccessDeniedException {
-        RefreshToken refreshToken = refreshTokenRepository.findByToken(token)
-                        .orElseThrow(() -> new IllegalArgumentException("Invalid refresh token"));
-
-        if(!refreshToken.getUser().getUsername().equalsIgnoreCase(currentUsername)) {
-            throw new AccessDeniedException("You can't revoke someone else's token");
-        }
-
-        if(refreshToken.isRevoked()) {
-            throw new IllegalArgumentException("Token is already revoked");
-        }
-
-        refreshToken.setRevoked(true);
-        refreshTokenRepository.save(refreshToken);
-    }
-
     public AuthResponse refreshToken(String refreshTokenStr) {
         String username = jwtService.extractUsername(refreshTokenStr);
         UserDetails userDetails = userDetailsService.loadUserByUsername(username);

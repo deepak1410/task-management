@@ -90,17 +90,6 @@ public class AuthController {
         return ResponseEntity.ok(authResponse);
     }
 
-    /*@PostMapping("/logout")
-    public ResponseEntity<String> logout1(@RequestBody @Valid RefreshTokenRequest request,
-                                       @AuthenticationPrincipal UserDetails userDetails) {
-        try {
-            refreshTokenService.revokeToken(request.refreshToken(), userDetails.getUsername());
-        } catch (AccessDeniedException e) {
-            ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
-        }
-        return ResponseEntity.ok("Logged out successfully");
-    }*/
-
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(HttpServletRequest request, HttpServletResponse response,
                                        @CookieValue(name = "refreshToken", required = false) String refreshToken) {
