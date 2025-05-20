@@ -1,7 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.deeptechhub</groupId>
@@ -23,21 +23,21 @@
         <maven.compiler.release>${java.version}</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
+        <!-- Library Versions -->
         <common-lib.version>1.0.0</common-lib.version>
         <spring-boot.version>3.4.5</spring-boot.version>
         <spring-cloud.version>2024.0.1</spring-cloud.version>
-
         <lombok.version>1.18.38</lombok.version>
         <mapstruct.version>1.6.3</mapstruct.version>
         <postgresql.version>42.7.5</postgresql.version>
         <springdoc.version>2.8.6</springdoc.version>
         <jjwt.version>0.12.6</jjwt.version>
-
         <testcontainers.version>1.21.0</testcontainers.version>
     </properties>
 
     <dependencyManagement>
         <dependencies>
+            <!-- Spring Boot BOM (manages JUnit/Mockito transitively) -->
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-dependencies</artifactId>
@@ -46,6 +46,7 @@
                 <scope>import</scope>
             </dependency>
 
+            <!-- Spring Cloud BOM -->
             <dependency>
                 <groupId>org.springframework.cloud</groupId>
                 <artifactId>spring-cloud-dependencies</artifactId>
@@ -54,6 +55,7 @@
                 <scope>import</scope>
             </dependency>
 
+            <!-- Testcontainers BOM -->
             <dependency>
                 <groupId>org.testcontainers</groupId>
                 <artifactId>testcontainers-bom</artifactId>
@@ -67,15 +69,18 @@
     <build>
         <pluginManagement>
             <plugins>
+                <!-- Compiler Plugin -->
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
                     <version>3.11.0</version>
                     <configuration>
                         <release>${java.version}</release>
+                        <parameters>true</parameters> <!-- For MapStruct -->
                     </configuration>
                 </plugin>
 
+                <!-- Spring Boot Plugin -->
                 <plugin>
                     <groupId>org.springframework.boot</groupId>
                     <artifactId>spring-boot-maven-plugin</artifactId>
@@ -84,5 +89,4 @@
             </plugins>
         </pluginManagement>
     </build>
-
 </project>

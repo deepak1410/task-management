@@ -98,10 +98,10 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public User verifyEmail(String tokenStr) {
         EmailToken token = emailTokenRepository.findByTokenAndUsedFalseAndExpiryDateAfter(tokenStr, LocalDateTime.now())
-                .orElseThrow(() -> new ResourceNotFoundException("Invalid or expired token"));
+                .orElseThrow(() -> new IllegalArgumentException("Invalid or expired token"));
 
         if (token.getUser().isEmailVerified()) {
-            throw new ResourceNotFoundException("Email already verified");
+            throw new IllegalArgumentException("Email already verified");
         }
 
         User user = token.getUser();

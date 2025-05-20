@@ -18,7 +18,6 @@ import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDateTime;
@@ -32,7 +31,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class AuthServiceImplUnitTest {
+class AuthServiceImplTest {
 
     private static final String USERNAME = "johndoe";
     private static final String EMAIL = "john@example.com";
@@ -229,7 +228,7 @@ class AuthServiceImplUnitTest {
         when(emailTokenRepository.findByTokenAndUsedFalseAndExpiryDateAfter(eq(TOKEN_STRING), any()))
                 .thenReturn(Optional.empty());
 
-        assertThrows(ResourceNotFoundException.class, () -> authService.verifyEmail(TOKEN_STRING));
+        assertThrows(IllegalArgumentException.class, () -> authService.verifyEmail(TOKEN_STRING));
 
         verify(userRepository, never()).save(any());
         verify(emailTokenRepository, never()).save(any());
@@ -245,7 +244,7 @@ class AuthServiceImplUnitTest {
         when(emailTokenRepository.findByTokenAndUsedFalseAndExpiryDateAfter(eq(TOKEN_STRING), any()))
                 .thenReturn(Optional.of(token));
 
-        assertThrows(ResourceNotFoundException.class, () -> authService.verifyEmail(TOKEN_STRING));
+        assertThrows(IllegalArgumentException.class, () -> authService.verifyEmail(TOKEN_STRING));
 
         verify(userRepository, never()).save(any());
         verify(emailTokenRepository, never()).save(any());

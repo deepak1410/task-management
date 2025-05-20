@@ -1,14 +1,7 @@
-FROM eclipse-temurin:21-jdk-alpine
+FROM eclipse-temurin:21-jre
 
 WORKDIR /app
 
-COPY target/identity-service-0.0.1-SNAPSHOT.jar app.jar
-COPY entrypoint.sh /app/entrypoint.sh
+COPY target/identity-service-*.jar app.jar
 
-# Optional: Add metadata to image
-LABEL maintainer="deepak.tech.hub.300@gmail.com"
-
-# Make the script executable
-RUN chmod +x /app/entrypoint.sh
-
-ENTRYPOINT ["/app/entrypoint.sh"]
+ENTRYPOINT ["java", "-jar", "app.jar"]

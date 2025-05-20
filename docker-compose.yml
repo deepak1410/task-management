@@ -108,9 +108,9 @@ secrets:
   db_password:
     file: ./secrets/db_password.txt
   jwt_secret:
-    file: ./secrets/jwt-secret.txt
+    file: ./secrets/jwt_secret.txt
   gmail_pass:
-    file: ./secrets/gmail-pass.txt
+    file: ./secrets/gmail_pass.txt
 
 networks:
   deeptechhub-network:
