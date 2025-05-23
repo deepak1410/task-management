@@ -2,7 +2,9 @@ spring:
   application:
     name: identity-service
   profiles:
-    active: docker #Default
+    active: local #Default for IDE runs
+  config:
+    import: classpath:application-${spring.profiles.active}.yml
 
   jpa:
     hibernate:
@@ -17,7 +19,6 @@ spring:
     host: smtp.gmail.com
     port: 587
     username: deepak.tech.hub.300@gmail.com
-    password: ${DTH_GMAIL_PWD}
     properties:
       mail:
         smtp:
@@ -26,7 +27,6 @@ spring:
             enable: true
 
 jwt:
-  secret: ${DTH_JWT_SECRET}
   accessTokenExpiryMs: 900000       # 15 minutes
   refreshTokenExpiryMs: 604800000   # 7 days
 
@@ -39,3 +39,4 @@ logging:
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
     file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+

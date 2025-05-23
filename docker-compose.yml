@@ -44,17 +44,20 @@ services:
         condition: service_healthy
     env_file: .env
     environment:
+      SPRING_PROFILES_ACTIVE: "docker"
       DB_HOST: postgres
       DB_PORT: 5432
       DB_NAME: ${IDENTITY_DB_NAME}
       DB_USER: ${POSTGRES_USER}
-      DB_PASSWORD_FILE: /run/secrets/db_password
-      DTH_JWT_SECRET_FILE: /run/secrets/jwt_secret
-      DTH_GMAIL_PWD_FILE: /run/secrets/gmail_pass
     secrets:
       - db_password
       - jwt_secret
       - gmail_pass
+    volumes:
+      - type: bind
+        source: ./secrets
+        target: /run/secrets
+        read_only: true
     ports:
       - "8081:8081"
     networks:

@@ -1,12 +1,12 @@
 package com.deeptechhub.identityservice.service;
 
-import com.deeptechhub.identityservice.config.JwtProperties;
 import com.deeptechhub.identityservice.exception.JwtAuthenticationException;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -15,16 +15,31 @@ import java.util.Date;
 import java.util.function.Function;
 
 @Service
-@RequiredArgsConstructor
 public class JwtServiceImpl implements JwtService {
-    private final JwtProperties jwtProperties;
+    private final String jwtSecret;
+    private final long accessTokenExpiryMs;
+    private final long refreshTokenExpiryMs;
     private SecretKey secretKey;
     private JwtParser jwtParser;
 
+    public JwtServiceImpl(
+            @Qualifier("jwtSecret") String jwtSecret,
+            @Value("${jwt.accessTokenExpiryMs}") long accessTokenExpiryMs,
+            @Value("${jwt.refreshTokenExpiryMs}") long refreshTokenExpiryMs) {
+        this.jwtSecret = jwtSecret;
+        this.accessTokenExpiryMs = accessTokenExpiryMs;
+        this.refreshTokenExpiryMs = refreshTokenExpiryMs;
+        initialize();
+    }
+
     @PostConstruct
-    public void init() {
-        this.secretKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtProperties.getSecret()));
-        this.jwtParser = Jwts.parser().verifyWith(secretKey).build();
+    public void initialize() {
+        try {
+            this.secretKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtSecret));
+            this.jwtParser = Jwts.parser().verifyWith(secretKey).build();
+        } catch (Exception e) {
+            throw new JwtAuthenticationException("Failed to initialize JWT service", e);
+        }
     }
 
     @Override
@@ -40,12 +55,12 @@ public class JwtServiceImpl implements JwtService {
 
     @Override
     public String generateAccessToken(String username) {
-        return generateToken(username, jwtProperties.getAccessTokenExpiryMs());
+        return generateToken(username, accessTokenExpiryMs);
     }
 
     @Override
     public String generateRefreshToken(String username) {
-        return generateToken(username, jwtProperties.getRefreshTokenExpiryMs());
+        return generateToken(username, refreshTokenExpiryMs);
     }
 
     private String generateToken(String username, long expiryMs) {
@@ -73,8 +88,7 @@ public class JwtServiceImpl implements JwtService {
         try {
             return jwtParser.parseSignedClaims(token).getPayload();
         } catch (JwtException ex) {
-            throw new JwtAuthenticationException("Invalid JWT token");
+            throw new JwtAuthenticationException("Invalid JWT token", ex);
         }
     }
-
 }

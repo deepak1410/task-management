@@ -1,6 +1,7 @@
 package com.deeptechhub.identityservice.controller;
 
 import com.deeptechhub.identityservice.BaseIntegrationTest;
+import com.deeptechhub.identityservice.config.TestConfig;
 import com.deeptechhub.identityservice.domain.EmailToken;
 import com.deeptechhub.identityservice.domain.User;
 import com.deeptechhub.identityservice.dto.*;
@@ -13,7 +14,9 @@ import jakarta.servlet.http.Cookie;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
@@ -23,6 +26,8 @@ import java.util.Map;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+@ActiveProfiles("test")
+@Import(TestConfig.class)
 class AuthControllerIntegrationTest extends BaseIntegrationTest {
 
     @Autowired

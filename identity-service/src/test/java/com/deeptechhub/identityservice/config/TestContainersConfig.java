@@ -18,29 +18,27 @@ public abstract class TestContainersConfig {
             .withPassword("testpass");
 
     @Container
-    static final GenericContainer<?> redisContainer = new GenericContainer<>(DockerImageName.parse("redis:alpine"))
+    static final GenericContainer<?> redisContainer = new GenericContainer<>("redis:alpine")
             .withExposedPorts(6379);
 
     @Container
-    static final GenericContainer<?> mailhogContainer = new GenericContainer<>(DockerImageName.parse("mailhog/mailhog"))
+    static final GenericContainer<?> mailhogContainer = new GenericContainer<>("mailhog/mailhog")
             .withExposedPorts(1025, 8025);
 
     @DynamicPropertySource
     static void registerProperties(DynamicPropertyRegistry registry) {
-        // PostgreSQL configuration
+        // Database
         registry.add("spring.datasource.url", postgreSQLContainer::getJdbcUrl);
         registry.add("spring.datasource.username", postgreSQLContainer::getUsername);
         registry.add("spring.datasource.password", postgreSQLContainer::getPassword);
         registry.add("spring.datasource.driver-class-name", () -> "org.postgresql.Driver");
 
-        // Redis configuration
+        // Redis
         registry.add("spring.redis.host", redisContainer::getHost);
         registry.add("spring.redis.port", redisContainer::getFirstMappedPort);
 
-        // Mail configuration (using MailHog)
+        // Mail (MailHog)
         registry.add("spring.mail.host", mailhogContainer::getHost);
         registry.add("spring.mail.port", mailhogContainer::getFirstMappedPort);
-        registry.add("spring.mail.properties.mail.smtp.auth", () -> "false");
-        registry.add("spring.mail.properties.mail.smtp.starttls.enable", () -> "false");
     }
 }

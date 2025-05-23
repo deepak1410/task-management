@@ -2,8 +2,16 @@ server:
   port: 8081
 
 spring:
+  profiles:
+    active: docker
   datasource:
     url: jdbc:postgresql://${DB_HOST:postgres}:${DB_PORT:5432}/${DB_NAME:authdb}
     username: ${DB_USER}
-    password: ${DB_PASSWORD}
+    password-file: /run/secrets/db_password.txt
     driver-class-name: org.postgresql.Driver
+
+jwt:
+  secret-file: /run/secrets/jwt_secret.txt
+
+mail:
+  password-file: /run/secrets/gmail_pass.txt

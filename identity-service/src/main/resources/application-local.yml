@@ -2,8 +2,16 @@ server:
   port: 8081
 
 spring:
+  profiles:
+    active: local
   datasource:
     url: jdbc:postgresql://localhost:5432/authdb
-    username: ${DB_USER}
-    password: ${DB_PASSWORD}
+    username: ${POSTGRES_USER:pguser}
+    password-file: ../secrets/db_password.txt
     driver-class-name: org.postgresql.Driver
+
+jwt:
+  secret-file: ../secrets/jwt_secret.txt
+
+mail:
+  password-file: ../secrets/gmail_pass.txt
