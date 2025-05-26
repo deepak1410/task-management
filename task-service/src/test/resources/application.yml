@@ -1,0 +1,44 @@
+spring:
+  profiles:
+    active: test
+  main:
+    allow-bean-definition-overriding: true
+    lazy-initialization: true  # Helps with test startup performance
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+
+jwt:
+  accessTokenExpiryMs: 900000       # 15 minutes
+  refreshTokenExpiryMs: 604800000   # 7 days
+  secret: "dGVzdC1zZWNyZXQtMTIzNDU2Nzg5MC1mb3ItdGVzdGluZy1vbmx5"  # Explicitly set test secret
+
+mail:
+  host: "localhost"                 # MailHog in tests
+  port: 1025                        # MailHog port
+  password: "test-gmail-password"  # Explicitly set test password
+  properties:
+    mail:
+      smtp:
+        auth: false
+        starttls:
+          enable: false
+
+identity-service:
+  url: http://localhost:8081
+
+# Feign test config
+feign:
+  client:
+    config:
+      default:
+        connectTimeout: 5000
+        readTimeout: 5000
+        loggingLevel: basic
+
+logging:
+  level:
+    root: INFO
+    org.springframework: WARN
+    org.hibernate.SQL: WARN
+    com.deeptechhub.taskservice: DEBUG

@@ -17,6 +17,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.security.Principal;
 import java.util.List;
 
 @Tag(name="Tasks", description = "Manage user tasks")
@@ -32,8 +33,8 @@ public class TaskController {
     @PostMapping
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public ResponseEntity<TaskResponse> createTask(@RequestBody @Valid TaskRequest taskRequest,
-                                                   @AuthenticationPrincipal UserDetails userDetails) {
-        log.debug("Attempting to create a task for user {}", userDetails.getUsername());
+                                                   Principal principal) {
+        log.debug("Attempting to create a task for user {}", principal.getName());
 
         TaskResponse taskResponse = taskService.createTask(taskRequest);
         return ResponseEntity.created(URI.create("/tasks" + taskResponse.id()))
@@ -42,15 +43,15 @@ public class TaskController {
 
     @GetMapping
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
-    public List<TaskResponse> getUserTasks(@AuthenticationPrincipal UserDetails userDetails) {
-        log.debug("Fetch user tasks for username {}", userDetails.getUsername());
-        return taskService.getUserTasks(userDetails.getUsername());
+    public List<TaskResponse> getUserTasks(Principal principal) {
+        log.debug("Fetch user tasks for username {}", principal.getName());
+        return taskService.getUserTasks(principal.getName());
     }
 
     @Tag(name="Tasks", description = "Fetch tasks for all users")
     @GetMapping("/all")
     @PreAuthorize("hasAnyRole('ADMIN')")
-    public List<TaskResponse> getAllTasks(@AuthenticationPrincipal UserDetails userDetails) {
+    public List<TaskResponse> getAllTasks(Principal principal) {
         log.debug("Get all the tasks for different users");
         return taskService.getAllTasks();
 

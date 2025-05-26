@@ -5,7 +5,7 @@ import com.deeptechhub.taskservice.domain.Task;
 import com.deeptechhub.taskservice.dto.TaskRequest;
 import com.deeptechhub.taskservice.dto.TaskResponse;
 import com.deeptechhub.taskservice.repository.TaskRepository;
-import com.deeptechhub.taskservice.util.SecurityUtils;
+import com.deeptechhub.taskservice.security.SecurityHelper;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -19,9 +19,10 @@ import java.util.List;
 public class TaskService {
     private static final Logger log = LoggerFactory.getLogger(TaskService.class);
     private final TaskRepository taskRepository;
+    private final SecurityHelper securityHelper;
 
     public TaskResponse createTask(TaskRequest taskRequest) {
-        Long createdByUserId = SecurityUtils.getCurrentUser().getId();
+        Long createdByUserId = securityHelper.getCurrentUser().getId();
 
         // Get task from request object
         Task task = new Task();
@@ -39,7 +40,7 @@ public class TaskService {
     }
 
     public List<TaskResponse> getUserTasks(String username) {
-        Long createdByUserId = SecurityUtils.getCurrentUser().getId();
+        Long createdByUserId = securityHelper.getCurrentUser().getId();
 
         return taskRepository.findByCreatedByUserId(createdByUserId).stream()
                 .map(TaskResponse::fromTask)
