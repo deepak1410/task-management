@@ -25,13 +25,17 @@
 
         <!-- Library Versions -->
         <common-lib.version>1.0.0</common-lib.version>
-        <spring-boot.version>3.4.5</spring-boot.version>
-        <spring-cloud.version>2024.0.1</spring-cloud.version>
+
+        <common-lang3.version>3.17.0</common-lang3.version>
+        <jjwt.version>0.12.6</jjwt.version>
+        <logstash-logback.version>8.1</logstash-logback.version>
         <lombok.version>1.18.38</lombok.version>
         <mapstruct.version>1.6.3</mapstruct.version>
         <postgresql.version>42.7.5</postgresql.version>
+        <slf4j-api.version>2.0.17</slf4j-api.version>
+        <spring-boot.version>3.4.5</spring-boot.version>
+        <spring-cloud.version>2024.0.1</spring-cloud.version>
         <springdoc.version>2.8.6</springdoc.version>
-        <jjwt.version>0.12.6</jjwt.version>
         <testcontainers.version>1.21.0</testcontainers.version>
     </properties>
 
@@ -63,6 +67,24 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
+
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>${slf4j-api.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>net.logstash.logback</groupId>
+                <artifactId>logstash-logback-encoder</artifactId>
+                <version>${logstash-logback.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-lang3</artifactId>
+                <version>${common-lang3.version}</version>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
 
