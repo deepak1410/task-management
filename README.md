@@ -1,7 +1,7 @@
 ## Architecture
 ```mermaid
 graph TD
-    A[deeptechhub] --> B[identity-service]
+    A[task-management] --> B[identity-service]
     A --> C[task-service]
     A --> D[common-lib]
     B --> E[(Postgres)]

@@ -1,5 +1,6 @@
 package com.deeptechhub.identityservice.controller;
 
+import com.deeptechhub.common.CommonApplicationConstants;
 import com.deeptechhub.common.dto.Role;
 import com.deeptechhub.identityservice.BaseIntegrationTest;
 import com.deeptechhub.identityservice.domain.User;
@@ -114,5 +115,18 @@ class UserControllerIntegrationTest extends BaseIntegrationTest  {
     void testListAllUsersAsNonAdminShouldFail() throws Exception {
         mockMvc.perform(get("/api/users"))
                 .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithMockUser(username = "testuser")
+    void shouldIncludeCorrelationIdInResponse() throws Exception {
+        mockMvc.perform(get("/api/users/username/testuser")
+                .header(CommonApplicationConstants.CORRELATION_ID_HEADER, "test-123"))
+        .andExpect(status().isOk())
+        .andExpect(header().exists(CommonApplicationConstants.CORRELATION_ID_HEADER))
+        .andExpect(header().string(
+                CommonApplicationConstants.CORRELATION_ID_HEADER,
+                "test-123"
+        ));
     }
 }
