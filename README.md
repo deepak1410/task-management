@@ -92,8 +92,8 @@ docker-compose logs -f
 * Task-Service Swagger URL: http://localhost:8082/swagger-ui/index.html
 
 ## Project Documentation
-* [API-Gateway] (docs/api-gateway.md)
-* [Logging Implementation] (docs/Logging_implementation.md)
-* [RBAC Implementation] (docs/RBAC_implementation.md)
-* [Secret Management] (docs/secret_management.md)
-* [Task-Service Design] (task-service/docs/design.md)
+* [API-Gateway](docs/api-gateway.md)
+* [Logging Implementation](docs/Logging_implementation.md)
+* [RBAC Implementation](docs/RBAC_implementation.md)
+* [Secret Management](docs/secret_management.md)
+* [Task-Service Design](task-service/docs/design.md)
