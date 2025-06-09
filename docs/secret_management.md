@@ -1,7 +1,7 @@
 ### Project Structure to manage secrets
 
 ```
-deeptechhub/
+task-management/
 ├── .gitignore
 ├── docker-compose.yml
 ├── .env

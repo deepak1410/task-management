@@ -16,6 +16,7 @@
         <module>common-lib</module>
         <module>identity-service</module>
         <module>task-service</module>
+        <module>api-gateway</module>
     </modules>
 
     <properties>
@@ -33,9 +34,12 @@
         <mapstruct.version>1.6.3</mapstruct.version>
         <postgresql.version>42.7.5</postgresql.version>
         <slf4j-api.version>2.0.17</slf4j-api.version>
-        <spring-boot.version>3.4.5</spring-boot.version>
-        <spring-cloud.version>2024.0.1</spring-cloud.version>
-        <springdoc.version>2.8.6</springdoc.version>
+        <spring-boot.version>3.5.0</spring-boot.version>
+        <spring-cloud.version>2025.0.0</spring-cloud.version>
+        <springdoc.version>2.8.8</springdoc.version>
+        <springdoc-openapi-webflux.version>2.8.8</springdoc-openapi-webflux.version>
+        <springdoc-openapi-webflux-core.version>1.8.0</springdoc-openapi-webflux-core.version>
+        <swagger-annotations.version>2.2.31</swagger-annotations.version>
         <testcontainers.version>1.21.0</testcontainers.version>
     </properties>
 
@@ -64,6 +68,15 @@
                 <groupId>org.testcontainers</groupId>
                 <artifactId>testcontainers-bom</artifactId>
                 <version>${testcontainers.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <!-- SpringDoc OpenAPI BOM -->
+            <dependency>
+                <groupId>org.springdoc</groupId>
+                <artifactId>springdoc-openapi-bom</artifactId>
+                <version>${springdoc.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>

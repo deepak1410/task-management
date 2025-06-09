@@ -9,25 +9,25 @@ graph TD
     B & C --> G[Redis]
 ```
 
-## Steps to Run
-1. Build JARs with correct manifest:
+## How to Run
+* Build project: Run the following command from root.
 
 ```
 mvn clean install -DskipTests
 
 ```
-2. Run services via Docker compose
+* Run all the services via Docker compose
 
    - Run all the services (Simplest)
       ```
       docker-compose --env-file .env up --build
       ```
-   - Alternately, Run only postgres, pgadmin, and redis services using docker
-      ```
-      docker-compose --env-file .env up --build postgres pgadmin redis
-      ```
-     - Run identity-service and task-service using Intellij
-     - Add following VM Option in Intellij `-Dspring.profiles.active=local`
+* Alternately, Run only postgres, pgadmin, and redis services using docker
+
+  ```
+  docker-compose --env-file .env up --build postgres pgadmin redis
+  ```
+     - Run identity-service, task-service, and api-gateway using Intellij
 
 ------
 ## Useful Docker commands
@@ -86,7 +86,14 @@ docker-compose logs -f
 * Test connection and Save.
 * To access PgAdmin, use URL http://localhost:6070/browser/ with credentials defined in .env file.
 
+## API Documentation
+* API Gateway Swagger URL: http://localhost:8070/swagger-ui/index.html
+* Identity-Service Swagger URL: http://localhost:8081/swagger-ui/index.html
+* Task-Service Swagger URL: http://localhost:8082/swagger-ui/index.html
 
-## Documentation
-### Task-Service
-- [Dev notes] (task-service/docs/dev_note.md)
+## Project Documentation
+* [API-Gateway] (./docs/api-gateway.md)
+* [Logging Implementation] (./docs/Logging_implementation.md)
+* [RBAC Implementation] (./docs/RBAC_implementation.md)
+* [Secret Management] (./docs/secret_management.md)
+* [Task-Service Design] (./task-service/docs/design.md)

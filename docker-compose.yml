@@ -23,10 +23,13 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+
   redis:
     image: redis:alpine
     ports:
       - "6379:6379"
+    networks:
+      - deeptechhub-network
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 5s
@@ -54,10 +57,7 @@ services:
       - jwt_secret
       - gmail_pass
     volumes:
-      - type: bind
-        source: ./secrets
-        target: /run/secrets
-        read_only: true
+      - ./secrets:/run/secrets:ro
     ports:
       - "8081:8081"
     networks:
@@ -67,13 +67,14 @@ services:
     build:
       context: ./task-service
     container_name: task-service
-    env_file: .env
     depends_on:
       postgres:
         condition: service_healthy
       identity-service:
         condition: service_started
+    env_file: .env
     environment:
+      SPRING_PROFILES_ACTIVE: "docker"
       DB_HOST: postgres
       DB_PORT: 5432
       DB_NAME: ${TASK_DB_NAME}
@@ -87,6 +88,30 @@ services:
       - gmail_pass
     ports:
       - "8082:8082"
+    networks:
+      - deeptechhub-network
+
+  api-gateway:
+    build:
+      context: ./api-gateway
+    container_name: api-gateway
+    depends_on:
+      identity-service:
+        condition: service_started
+      task-service:
+        condition: service_started
+    environment:
+      SPRING_PROFILES_ACTIVE: "docker"
+      SERVER_PORT: "8070"
+      IDENTITY_SERVICE_URL: http://identity-service:8081
+      TASK_SERVICE_URL: http://task-service:8082
+      JWT_SECRET_FILE: /run/secrets/jwt_secret
+    secrets:
+      - jwt_secret
+    volumes:
+      - ./secrets:/run/secrets:ro
+    ports:
+      - "8070:8070"
     networks:
       - deeptechhub-network
 

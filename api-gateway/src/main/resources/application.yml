@@ -1,0 +1,93 @@
+server:
+  port: 8070
+
+spring:
+  application:
+    name: api-gateway
+  profiles:
+    active: local
+  main:
+    web-application-type: reactive
+  web:
+    resources:
+      add-mappings: false
+  config:
+    import: classpath:application-${spring.profiles.active}.yml
+  cloud:
+    gateway:
+      httpclient:
+        connect-timeout: 1000
+        response-timeout: 5s
+      default-filters: []
+      routes:
+        - id: identity-service
+          uri: ${IDENTITY_SERVICE_URL:http://localhost:8081}
+          predicates:
+            - Path=/api/auth/**,/api/users/**, /v3/api-docs/identity-service
+          filters:
+            - RewritePath=/api/(?<segment>.*), /api/$\{segment}
+            - RewritePath=/v3/api-docs/identity, /v3/api-docs
+        - id: task-service
+          uri: ${TASK_SERVICE_URL:http://localhost:8082}
+          predicates:
+            - Path=/api/tasks/**, /v3/api-docs/task-service
+          filters:
+            - RewritePath=/api/(?<segment>.*), /api/$\{segment}
+            - RewritePath=/v3/api-docs/task, /v3/api-docs
+  spring:
+    security:
+      oauth2:
+        resourceserver:
+          jwt:
+            enabled: false
+
+jwt:
+  secretFile: ../secrets/jwt_secret.txt
+  accessTokenExpiryMs: 900000 # 15 minutes
+  refreshTokenExpiryMs: 604800000   # 7 days
+  excludePaths:
+    - /api/auth/**
+    - /actuator/**
+    - /public/**
+    - /swagger-ui/**
+    - /v3/api-docs/**
+
+management:
+  endpoint:
+    gateway:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: gateway
+
+eureka:
+  client:
+    enabled: false
+
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    urls:
+      - url: /v3/api-docs/gateway
+        name: gateway
+      - url: /v3/api-docs/identity-service
+        name: identity-service
+      - url: /v3/api-docs/task-service
+        name: task-service
+
+logging:
+  level:
+    root: INFO
+    com.deeptechhub.apigateway: DEBUG
+    org.springframework.cloud.gateway: DEBUG
+    org.springframework.cloud.gateway.handler.RoutePredicateHandlerMapping: DEBUG
+    org.springframework.security: DEBUG
+    org.springframework.web.server: DEBUG
+    org.springdoc: DEBUG
+  file:
+    name: logs/api-gateway.log
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"

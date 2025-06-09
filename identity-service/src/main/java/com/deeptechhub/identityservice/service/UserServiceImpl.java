@@ -25,6 +25,7 @@ public class UserServiceImpl implements UserService {
     public UserDto findByUsername(String username) {
         User user = userRepository.findByUsername(username).orElseThrow(() ->
                 new ResourceNotFoundException("User with username " + username + " not found"));
+        log.info("Found user {}", username);
 
         return getUserDtoFromUser(user);
     }
