@@ -46,21 +46,7 @@
   </dependency>
   ```
 
-### **4. Request/Response Logging**
-- **Why?** Audit and debug traffic
-- **Implementation**:
-  ```java
-  @Bean
-  public GlobalFilter loggingFilter() {
-      return (exchange, chain) -> {
-          logRequest(exchange.getRequest());
-          return chain.filter(exchange)
-              .doOnSuccessOrError((r, t) -> logResponse(exchange.getResponse()));
-      };
-  }
-  ```
-
-### **7. Metrics & Monitoring**
+### **4. Metrics & Monitoring**
 - **Why?** Track performance and health
 - **Implementation**:
   ```yaml
@@ -72,7 +58,7 @@
   ```
   Integrate with Prometheus/Grafana.
 
-### **8. Request/Response Transformation**
+### **5. Request/Response Transformation**
 - **Why?** Modify payloads between services
 - **Implementation**:
   ```yaml
@@ -84,7 +70,7 @@
         rewriteFunction: "requestBody -> return modifiedBody"
   ```
 
-### **9. Service Discovery Integration**
+### **6. Service Discovery Integration**
 - **Why?** Dynamic routing if you scale services
 - **Implementation**:
   ```yaml

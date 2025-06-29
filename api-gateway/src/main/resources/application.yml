@@ -18,28 +18,42 @@ spring:
       httpclient:
         connect-timeout: 1000
         response-timeout: 5s
-      default-filters: []
+      default-filters:
+        - name: JwtAuthFilter
       routes:
         - id: identity-service
           uri: ${IDENTITY_SERVICE_URL:http://localhost:8081}
           predicates:
-            - Path=/api/auth/**,/api/users/**, /v3/api-docs/identity-service
+            - Path=/api/auth/**,/api/users/**,/v3/api-docs/identity-service
           filters:
-            - RewritePath=/api/(?<segment>.*), /api/$\{segment}
+            - RewritePath=/api/(?<segment>.*), /api/${segment}
             - RewritePath=/v3/api-docs/identity, /v3/api-docs
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 5
+                redis-rate-limiter.burstCapacity: 10
+                key-resolver: "#{@ipKeyResolver}"
+
         - id: task-service
           uri: ${TASK_SERVICE_URL:http://localhost:8082}
           predicates:
-            - Path=/api/tasks/**, /v3/api-docs/task-service
+            - Path=/api/tasks/**,/v3/api-docs/task-service
           filters:
-            - RewritePath=/api/(?<segment>.*), /api/$\{segment}
+            - RewritePath=/api/(?<segment>.*), /api/${segment}
             - RewritePath=/v3/api-docs/task, /v3/api-docs
-  spring:
-    security:
-      oauth2:
-        resourceserver:
-          jwt:
-            enabled: false
+            - name: RequestRateLimiter
+              args:
+                # x requests per seconds after burst capacity
+                redis-rate-limiter.replenishRate: 1
+                # n immediate requests can be sent.
+                redis-rate-limiter.burstCapacity: 10
+                key-resolver: "#{@ipKeyResolver}"
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          enabled: false
 
 jwt:
   secretFile: ../secrets/jwt_secret.txt
@@ -81,11 +95,11 @@ logging:
   level:
     root: INFO
     com.deeptechhub.apigateway: DEBUG
-    org.springframework.cloud.gateway: DEBUG
-    org.springframework.cloud.gateway.handler.RoutePredicateHandlerMapping: DEBUG
-    org.springframework.security: DEBUG
-    org.springframework.web.server: DEBUG
-    org.springdoc: DEBUG
+    org.springframework.cloud.gateway: INFO
+    org.springframework.security: INFO
+    org.springframework.web.server: INFO
+    org.springdoc: INFO
+    org.springframework.cloud.gateway.filter.ratelimit: INFO
   file:
     name: logs/api-gateway.log
   pattern:
