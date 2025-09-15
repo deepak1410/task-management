@@ -34,3 +34,8 @@ build/
 
 ### Secrets ###
 secrets/
+
+### Logs ###
+api-gateway/logs/
+identity-service/logs/
+task-service/logs/

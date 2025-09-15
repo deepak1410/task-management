@@ -1,6 +1,8 @@
 spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/taskdb
-    username: ${DB_USER}
-    password: ${DB_PASSWORD}
+    username: ${POSTGRES_USER:pguser}
     driver-class-name: org.postgresql.Driver
+
+jwt:
+  secret-file: ../secrets/jwt_secret.txt

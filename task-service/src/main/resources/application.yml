@@ -5,7 +5,7 @@ spring:
   application:
     name: task-service
   profiles:
-    active: docker
+    active: local
 
   flyway:
     enabled: true
@@ -21,7 +21,6 @@ spring:
         format_sql: true
 
 jwt:
-  secret: ${DTH_JWT_SECRET}
   accessTokenExpiryMs: 900000       # 15 minutes
   refreshTokenExpiryMs: 604800000   # 7 days
 

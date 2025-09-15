@@ -4,3 +4,6 @@ spring:
     username: ${DB_USER}
     password: ${DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
+
+jwt:
+  secret-file: /run/secrets/jwt_secret.txt
